@@ -18,6 +18,7 @@ var bridgesCmd = &cobra.Command{
 	Short: "work with hue bridges",
 	Long:  `TODO`,
 	Run: func(cmd *cobra.Command, args []string) {
+		// display help
 	},
 }
 
@@ -32,12 +33,12 @@ var discoverCmd = &cobra.Command{
 			panic(s)
 		}
 
-		fmt.Println("HOST\tUSER\tID")
-		fmt.Println("-----------------------------------------------------------------------------")
+		fmt.Println("HOST                   ID")
+		fmt.Println("-------------------------------------------")
 
 		for i := range bridges {
 			bridge := bridges[i]
-			fmt.Printf("%v\t%v\t%v\n", bridge.Host, bridge.User, bridge.ID)
+			fmt.Printf("%v         %v\n", bridge.Host, bridge.ID)
 		}
 	},
 }

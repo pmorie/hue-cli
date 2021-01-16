@@ -19,7 +19,7 @@ var (
 		Short: "hue-cli is a CLI tool for philips hue ecosystem",
 		Long:  `TODO`,
 		Run: func(cmd *cobra.Command, args []string) {
-			// Do Stuff Here
+			// display help
 		},
 	}
 )
@@ -47,9 +47,8 @@ func initConfig() {
 			panic(s)
 		}
 
-		// Search config in home directory with name ".cobra" (without extension).
 		viper.AddConfigPath(home)
-		viper.SetConfigName(".cobra")
+		viper.SetConfigName(".hue-cli")
 	}
 
 	viper.AutomaticEnv()
