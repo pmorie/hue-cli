@@ -7,12 +7,14 @@ import (
 
 	"github.com/amimof/huego"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
 type setupParamz struct {
 	bridgeIP string
 	user     string
 	wait     bool
+	verbose  bool
 }
 
 var (
@@ -46,7 +48,13 @@ var (
 			fmt.Printf("Bridge Configuration:\n%+v", bridgeConfig)
 			// TODO: save off the username (what about auth??) and ip address of the bridge
 
-			// re-load the username from the state file and ensure it saved correctly
+			viper.Set("bridgeIP", setupParams.bridgeIP)
+			viper.Set("user", setupParams.user)
+			err = viper.WriteConfig()
+			if err != nil {
+				s := fmt.Sprintf("unable to write config: %v", err)
+				panic(s)
+			}
 		},
 	}
 )
@@ -55,6 +63,7 @@ func init() {
 	setupCmd.PersistentFlags().StringVar(&setupParams.bridgeIP, "bridgeIP", "", "IP of the bridge to setup")
 	setupCmd.PersistentFlags().StringVar(&setupParams.user, "user", "hue-cli", "user to setup")
 	setupCmd.PersistentFlags().BoolVar(&setupParams.wait, "wait", true, "user to setup")
+	setupCmd.PersistentFlags().BoolVar(&setupParams.verbose, "verbose", false, "verbosity")
 
 	rootCmd.AddCommand(setupCmd)
 }

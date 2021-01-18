@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 
 	homedir "github.com/mitchellh/go-homedir"
 	"github.com/spf13/cobra"
@@ -47,8 +48,23 @@ func initConfig() {
 			panic(s)
 		}
 
+		var (
+			configName = ".hue-cli"
+			configType = "yml"
+		)
 		viper.AddConfigPath(home)
-		viper.SetConfigName(".hue-cli")
+		viper.SetConfigName(configName)
+		viper.SetConfigType(configType)
+		configPath := filepath.Join(home, configName+"."+configType)
+
+		_, err = os.Stat(configPath)
+		if !os.IsExist(err) {
+			if _, err := os.Create(configPath); err != nil {
+				fmt.Printf("Creating config file at %v\n", configPath)
+				s := fmt.Sprintf("error creating config file at path %q: %v", configPath, err)
+				panic(s)
+			}
+		}
 	}
 
 	viper.AutomaticEnv()
