@@ -58,9 +58,9 @@ func initConfig() {
 		configPath := filepath.Join(home, configName+"."+configType)
 
 		_, err = os.Stat(configPath)
-		if !os.IsExist(err) {
+		if os.IsNotExist(err) {
+			fmt.Printf("Creating config file at %v\n", configPath)
 			if _, err := os.Create(configPath); err != nil {
-				fmt.Printf("Creating config file at %v\n", configPath)
 				s := fmt.Sprintf("error creating config file at path %q: %v", configPath, err)
 				panic(s)
 			}

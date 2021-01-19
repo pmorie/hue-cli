@@ -48,8 +48,8 @@ var (
 			fmt.Printf("Bridge Configuration:\n%+v", bridgeConfig)
 			// TODO: save off the username (what about auth??) and ip address of the bridge
 
-			viper.Set("bridgeIP", setupParams.bridgeIP)
-			viper.Set("user", setupParams.user)
+			viper.Set("bridgeip", setupParams.bridgeIP)
+			viper.Set("huecliuser", setupParams.user)
 			err = viper.WriteConfig()
 			if err != nil {
 				s := fmt.Sprintf("unable to write config: %v", err)
