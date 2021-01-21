@@ -98,7 +98,11 @@ var statusCmd = &cobra.Command{
 			fmt.Printf("Allowed clients: %v\n", len(bridgeConfig.WhitelistMap))
 		}
 
-		fmt.Printf("Portal State: %v\n", bridgeConfig.PortalState)
+		fmt.Println("Portal State:")
+		fmt.Printf("  Signed On: %v\n", bridgeConfig.PortalState.SignedOn)
+		fmt.Printf("  Incoming: %v\n", bridgeConfig.PortalState.Incoming)
+		fmt.Printf("  Outgoing: %v\n", bridgeConfig.PortalState.Outgoing)
+		fmt.Printf("  Communication: %v\n", bridgeConfig.PortalState.Communication)
 		fmt.Printf("API Version: %v\n", bridgeConfig.APIVersion)
 		fmt.Printf("SW Version: %v\n", bridgeConfig.SwVersion)
 		fmt.Printf("Proxy Address: %v\n", bridgeConfig.ProxyAddress)
