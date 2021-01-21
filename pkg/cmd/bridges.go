@@ -74,7 +74,7 @@ var statusCmd = &cobra.Command{
 		}
 
 		if user == "" {
-			fmt.Println("A bridgeIP is not configured. Use discover and setup commands to set up a bridge")
+			fmt.Println("A user is not configured. Use discover and setup commands to set up a bridge")
 			os.Exit(1)
 		}
 
