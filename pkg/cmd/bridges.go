@@ -14,18 +14,19 @@ func init() {
 	setupCmd.PersistentFlags().StringVar(&setupParams.bridgeIP, "bridgeIP", "", "IP of the bridge to setup")
 	setupCmd.PersistentFlags().StringVar(&setupParams.user, "user", "hue-cli", "user to setup")
 	setupCmd.PersistentFlags().BoolVar(&setupParams.wait, "wait", true, "user to setup")
-	setupCmd.PersistentFlags().BoolVar(&setupParams.verbose, "verbose", false, "verbosity")
 
-	bridgesCmd.AddCommand(setupCmd)
-	bridgesCmd.AddCommand(discoverCmd)
-	bridgesCmd.AddCommand(statusCmd)
+	statusCmd.PersistentFlags().BoolVar(&statusParams.verbose, "verbose", false, "verbosity")
 
-	rootCmd.AddCommand(bridgesCmd)
+	bridgeCmd.AddCommand(setupCmd)
+	bridgeCmd.AddCommand(discoverCmd)
+	bridgeCmd.AddCommand(statusCmd)
+
+	rootCmd.AddCommand(bridgeCmd)
 }
 
-var bridgesCmd = &cobra.Command{
-	Use:   "bridges",
-	Short: "work with hue bridges",
+var bridgeCmd = &cobra.Command{
+	Use:   "bridge",
+	Short: "Work with hue bridges",
 	Long:  `TODO`,
 	Run: func(cmd *cobra.Command, args []string) {
 		// display help
@@ -53,9 +54,15 @@ var discoverCmd = &cobra.Command{
 	},
 }
 
+type statusParamz struct {
+	verbose bool
+}
+
+var statusParams = statusParamz{}
+
 var statusCmd = &cobra.Command{
 	Use:   "status",
-	Short: "show the status of the configured bridge",
+	Short: "Show the status of the configured bridge",
 	Long:  "TODO",
 	Run: func(cmd *cobra.Command, args []string) {
 		bridgeIP := viper.GetString("bridgeip")
@@ -91,11 +98,45 @@ var statusCmd = &cobra.Command{
 		fmt.Printf("    Last Update Time: %v\n", bridgeConfig.SwUpdate2.AutoInstall.UpdateTime)
 		fmt.Printf("  Last Change: %v\n", bridgeConfig.SwUpdate2.LastChange)
 		fmt.Printf("  Last Install: %v\n", bridgeConfig.SwUpdate2.LastInstall)
-		fmt.Println("Allowed Clients:")
-		for k, _ := range bridgeConfig.WhitelistMap {
-			fmt.Printf("  %v\n", k)
+
+		if statusParams.verbose {
+			fmt.Println("Allowed Clients:")
+			for k, _ := range bridgeConfig.WhitelistMap {
+				fmt.Printf("  %v\n", k)
+			}
+			fmt.Printf("")
+		} else {
+			fmt.Printf("Allowed clients: %v\n", len(bridgeConfig.WhitelistMap))
 		}
-		fmt.Printf("")
+
+		fmt.Printf("Portal State: %v\n", bridgeConfig.PortalState)
+		fmt.Printf("API Version: %v\n", bridgeConfig.APIVersion)
+		fmt.Printf("SW Version: %v\n", bridgeConfig.SwVersion)
+		fmt.Printf("Proxy Address: %v\n", bridgeConfig.ProxyAddress)
+		fmt.Printf("Proxy Port: %v\n", bridgeConfig.ProxyPort)
+		fmt.Printf("Link Button: %v\n", bridgeConfig.LinkButton)
+		fmt.Printf("IP Address: %v\n", bridgeConfig.IPAddress)
+		fmt.Printf("MAC Address: %v\n", bridgeConfig.Mac)
+		fmt.Printf("Net Mask: %v\n", bridgeConfig.NetMask)
+		fmt.Printf("Gateway: %v\n", bridgeConfig.Gateway)
+		fmt.Printf("DHCP Address: %v\n", bridgeConfig.Dhcp)
+		fmt.Printf("Portal Services: %v\n", bridgeConfig.PortalServices)
+		fmt.Printf("UTC: %v\n", bridgeConfig.UTC)
+		fmt.Printf("Local Time: %v\n", bridgeConfig.LocalTime)
+		fmt.Printf("Time Zone: %v\n", bridgeConfig.TimeZone)
+		fmt.Printf("Zigbee Channel: %v\n", bridgeConfig.ZigbeeChannel)
+		fmt.Printf("Model ID: %v\n", bridgeConfig.ModelID)
+		fmt.Printf("Bridge ID: %v\n", bridgeConfig.BridgeID)
+		fmt.Printf("Factory New: %v\n", bridgeConfig.FactoryNew)
+		fmt.Printf("Replaces Bridge ID: %v\n", bridgeConfig.ReplacesBridgeID)
+		fmt.Printf("Datastore Version: %v\n", bridgeConfig.DatastoreVersion)
+		fmt.Printf("Starter Kit ID: %v\n", bridgeConfig.StarterKitID)
+		fmt.Println("Internet Service:")
+		fmt.Printf("  Internet: %v\n", bridgeConfig.InternetService.Internet)
+		fmt.Printf("  Remote Access: %v\n", bridgeConfig.InternetService.RemoteAccess)
+		fmt.Printf("  Time: %v\n", bridgeConfig.InternetService.Time)
+		fmt.Printf("  SW Update: %v\n", bridgeConfig.InternetService.SwUpdate)
+
 	},
 }
 
@@ -111,7 +152,7 @@ var (
 
 	setupCmd = &cobra.Command{
 		Use:   "setup",
-		Short: "setup a new user with the hue bridge",
+		Short: "Setup a hue bridge to work with the CLI",
 		Long:  `TODO`,
 		Run: func(cmd *cobra.Command, args []string) {
 			bridge := huego.New(setupParams.bridgeIP, "")
