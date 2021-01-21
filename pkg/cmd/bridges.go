@@ -65,18 +65,7 @@ var statusCmd = &cobra.Command{
 	Short: "Show the status of the configured bridge",
 	Long:  "TODO",
 	Run: func(cmd *cobra.Command, args []string) {
-		bridgeIP := viper.GetString("bridgeip")
-		user := viper.GetString("huecliuser")
-
-		if bridgeIP == "" {
-			fmt.Println("A bridgeIP is not configured. Use discover and setup commands to set up a bridge")
-			os.Exit(1)
-		}
-
-		if user == "" {
-			fmt.Println("A user is not configured. Use discover and setup commands to set up a bridge")
-			os.Exit(1)
-		}
+		bridgeIP, user := getLoginFromConfig()
 
 		fmt.Printf("Bridge IP: %v\n", bridgeIP)
 		fmt.Printf("User: %v\n", user)

@@ -73,3 +73,20 @@ func initConfig() {
 		fmt.Println("Using config file:", viper.ConfigFileUsed())
 	}
 }
+
+func getLoginFromConfig() (string, string) {
+	bridgeIP := viper.GetString("bridgeip")
+	user := viper.GetString("huecliuser")
+
+	if bridgeIP == "" {
+		fmt.Println("A bridgeIP is not configured. Use discover and setup commands to set up a bridge")
+		os.Exit(1)
+	}
+
+	if user == "" {
+		fmt.Println("A user is not configured. Use discover and setup commands to set up a bridge")
+		os.Exit(1)
+	}
+
+	return bridgeIP, user
+}
