@@ -1,6 +1,9 @@
 package cmd
 
 import (
+	"fmt"
+
+	"github.com/amimof/huego"
 	"github.com/spf13/cobra"
 )
 
@@ -24,7 +27,22 @@ var groupsListCmd = &cobra.Command{
 	Short: "list groups",
 	Long:  "TODO",
 	Run: func(cmd *cobra.Command, args []string) {
-		// load config
-		// login with user
+		bridgeIP, user := getLoginFromConfig()
+
+		fmt.Printf("Bridge IP: %v\n", bridgeIP)
+		fmt.Printf("User: %v\n", user)
+
+		bridge := huego.New(bridgeIP, user)
+
+		groups, err := bridge.GetGroups()
+		if err != nil {
+			s := fmt.Sprintf("unable to connect to bridge: %v", err)
+			panic(s)
+		}
+
+		for i := range groups {
+			group := groups[i]
+			fmt.Printf("%v\t\t\t%v\n", group.Name, group.GroupState.AnyOn)
+		}
 	},
 }
