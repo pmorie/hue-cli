@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"text/tabwriter"
 
 	"github.com/amimof/huego"
 	"github.com/spf13/cobra"
@@ -44,13 +45,16 @@ var discoverCmd = &cobra.Command{
 			panic(s)
 		}
 
-		fmt.Println("HOST                   ID")
-		fmt.Println("-------------------------------------------")
+		w := tabwriter.NewWriter(os.Stdout, 0, 0, 1, ' ', 0)
+
+		fmt.Fprintln(w, "IP\tID")
 
 		for i := range bridges {
 			bridge := bridges[i]
-			fmt.Printf("%v         %v\n", bridge.Host, bridge.ID)
+			fmt.Fprintf(w, "%v\t%v\n", bridge.Host, bridge.ID)
 		}
+
+		w.Flush()
 	},
 }
 
@@ -66,10 +70,6 @@ var statusCmd = &cobra.Command{
 	Long:  "TODO",
 	Run: func(cmd *cobra.Command, args []string) {
 		bridgeIP, user := getLoginFromConfig()
-
-		fmt.Printf("Bridge IP: %v\n", bridgeIP)
-		fmt.Printf("User: %v\n", user)
-
 		bridge := huego.New(bridgeIP, user)
 		bridgeConfig, err := bridge.GetConfig()
 		if err != nil {

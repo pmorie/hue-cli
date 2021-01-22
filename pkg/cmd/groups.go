@@ -2,6 +2,8 @@ package cmd
 
 import (
 	"fmt"
+	"os"
+	"text/tabwriter"
 
 	"github.com/amimof/huego"
 	"github.com/spf13/cobra"
@@ -40,9 +42,13 @@ var groupsListCmd = &cobra.Command{
 			panic(s)
 		}
 
+		w := tabwriter.NewWriter(os.Stdout, 0, 0, 1, ' ', 0)
+
 		for i := range groups {
 			group := groups[i]
-			fmt.Printf("%v\t\t\t%v\n", group.Name, group.GroupState.AnyOn)
+			fmt.Fprintf(w, "%v\t%v\n", group.Name, group.GroupState.AnyOn)
 		}
+
+		w.Flush()
 	},
 }
