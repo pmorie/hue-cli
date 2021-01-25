@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"sort"
 	"text/tabwriter"
 
 	"github.com/amimof/huego"
@@ -37,6 +38,14 @@ var groupsListCmd = &cobra.Command{
 			s := fmt.Sprintf("unable to connect to bridge: %v", err)
 			panic(s)
 		}
+
+		sort.Slice(groups, func(i, j int) bool {
+			if len(groups[i].Name) == len(groups[j].Name) {
+				return groups[i].Name < groups[j].Name
+			}
+
+			return len(groups[i].Name) < len(groups[j].Name)
+		})
 
 		w := tabwriter.NewWriter(os.Stdout, 0, 0, 1, ' ', 0)
 
