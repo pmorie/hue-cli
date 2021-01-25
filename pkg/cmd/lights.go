@@ -49,6 +49,9 @@ var lightsListCmd = &cobra.Command{
 			return len(lights[i].Name) < len(lights[j].Name)
 		})
 
+		fmt.Fprintln(w, "Name\tOn?")
+		fmt.Fprintln(w, "----\t---")
+
 		for i := range lights {
 			light := lights[i]
 			fmt.Fprintf(w, "%v\t%v\n", light.Name, light.State.On)

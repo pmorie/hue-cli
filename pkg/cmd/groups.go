@@ -48,6 +48,8 @@ var groupsListCmd = &cobra.Command{
 		})
 
 		w := tabwriter.NewWriter(os.Stdout, 0, 0, 1, ' ', 0)
+		fmt.Fprintln(w, "Name\tAny On?")
+		fmt.Fprintln(w, "----\t-------")
 
 		for i := range groups {
 			group := groups[i]
