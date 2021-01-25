@@ -110,7 +110,6 @@ var lightsGetCmd = &cobra.Command{
 		fmt.Fprintf(w, "  Hue Increment:\t%v\n", light.State.HueInc)
 		fmt.Fprintf(w, "  Color Temperature Increment:\t%v\n", light.State.CtInc)
 		fmt.Fprintf(w, "  XY Increment:\t%v\n", light.State.XyInc)
-
 		fmt.Fprintf(w, "  Color Mode:\t%v\n", light.State.ColorMode)
 		fmt.Fprintf(w, "  Reachable:\t%v\n", light.State.Reachable)
 		fmt.Fprintf(w, "  Scene:\t%v\n", light.State.Scene)

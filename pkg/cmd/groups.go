@@ -88,10 +88,13 @@ var groupsGetCmd = &cobra.Command{
 		fmt.Fprintf(w, "Name:\t%v\n", group.Name)
 		fmt.Fprintf(w, "ID:\t%v\n", group.ID)
 		fmt.Fprintf(w, "Type:\t%v\n", group.Type)
+		fmt.Fprintf(w, "Class:\t%v\n", group.Class)
 
 		fmt.Fprintln(w, "State:\t")
 		fmt.Fprintf(w, "  Any On:\t%v\n", group.GroupState.AnyOn)
 		fmt.Fprintf(w, "  All On:\t%v\n", group.GroupState.AllOn)
+
+		fmt.Fprintf(w, "Recycle:\t%v\n", group.Recycle)
 
 		w.Flush()
 	},
