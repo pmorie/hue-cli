@@ -21,6 +21,7 @@ func init() {
 	bridgeCmd.AddCommand(setupCmd)
 	bridgeCmd.AddCommand(discoverCmd)
 	bridgeCmd.AddCommand(statusCmd)
+	bridgeCmd.AddCommand(capabilitiesCmd)
 
 	rootCmd.AddCommand(bridgeCmd)
 }
@@ -178,3 +179,32 @@ var (
 		},
 	}
 )
+
+var capabilitiesCmd = &cobra.Command{
+	Use:   "capabilities",
+	Short: "show capabilities of the linked hue bridge",
+	Long:  "TODO",
+	Run: func(cmd *cobra.Command, args []string) {
+		bridgeIP, user := getLoginFromConfig()
+		bridge := huego.New(bridgeIP, user)
+
+		capabilities, err := bridge.GetCapabilities()
+		if err != nil {
+			s := fmt.Sprintf("unable to connect to bridge: %v", err)
+			panic(s)
+		}
+
+		w := tabwriter.NewWriter(os.Stdout, 0, 0, 1, ' ', 0)
+		fmt.Fprintln(w, "Name\tAvailable")
+		fmt.Fprintln(w, "----\t---------")
+		fmt.Fprintf(w, "Groups\t%v\n", capabilities.Groups.Available)
+		fmt.Fprintf(w, "Lights\t%v\n", capabilities.Lights.Available)
+		fmt.Fprintf(w, "Resource Links\t%v\n", capabilities.Resourcelinks.Available)
+		fmt.Fprintf(w, "Rules\t%v\n", capabilities.Rules.Available)
+		fmt.Fprintf(w, "Scenes\t%v\n", capabilities.Scenes.Available)
+		fmt.Fprintf(w, "Sensors\t%v\n", capabilities.Sensors.Available)
+		fmt.Fprintf(w, "Streaming\t%v\n", capabilities.Streaming.Available)
+
+		w.Flush()
+	},
+}
