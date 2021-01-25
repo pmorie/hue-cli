@@ -30,10 +30,6 @@ var groupsListCmd = &cobra.Command{
 	Long:  "TODO",
 	Run: func(cmd *cobra.Command, args []string) {
 		bridgeIP, user := getLoginFromConfig()
-
-		fmt.Printf("Bridge IP: %v\n", bridgeIP)
-		fmt.Printf("User: %v\n", user)
-
 		bridge := huego.New(bridgeIP, user)
 
 		groups, err := bridge.GetGroups()
