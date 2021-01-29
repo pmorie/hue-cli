@@ -100,7 +100,9 @@ var lightsGetCmd = &cobra.Command{
 		fmt.Fprintf(w, "  Brightness:\t%v\n", light.State.Bri)
 		fmt.Fprintf(w, "  Hue:\t%v\n", light.State.Hue)
 		fmt.Fprintf(w, "  Saturation:\t%v\n", light.State.Sat)
-		fmt.Fprintf(w, "  XY:\t[%v, %v]\n", light.State.Xy[0], light.State.Xy[1])
+		if len(light.State.Xy) >= 2 {
+			fmt.Fprintf(w, "  XY:\t[%v, %v]\n", light.State.Xy[0], light.State.Xy[1])
+		}
 		fmt.Fprintf(w, "  Color Temperature:\t%v\n", light.State.Ct)
 		fmt.Fprintf(w, "  Alert:\t%v\n", light.State.Alert)
 		fmt.Fprintf(w, "  Effect:\t%v\n", light.State.Effect)

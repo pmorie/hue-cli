@@ -8,6 +8,9 @@ import (
 	"text/tabwriter"
 
 	"github.com/amimof/huego"
+	"github.com/erikh/colorwriter"
+	"github.com/gookit/color"
+	pcolor "github.com/pmorie/hue-cli/pkg/color"
 	"github.com/spf13/cobra"
 )
 
@@ -51,7 +54,7 @@ var groupsListCmd = &cobra.Command{
 			return len(groups[i].Name) < len(groups[j].Name)
 		})
 
-		w := tabwriter.NewWriter(os.Stdout, 0, 0, 1, ' ', 0)
+		w := colorwriter.NewWriter(os.Stdout, 0, 0, 1, ' ', 0)
 		fmt.Fprintln(w, "Name\tID\tAny On?")
 		fmt.Fprintln(w, "----\t----\t-------")
 
@@ -97,8 +100,11 @@ var groupsGetCmd = &cobra.Command{
 
 		fmt.Fprintf(w, "Recycle:\t%v\n", group.Recycle)
 
+		// TODO sort
+
 		fmt.Fprintln(w, "Lights:\t")
 		for i := range group.Lights {
+
 			id, err := strconv.Atoi(group.Lights[i])
 			if err != nil {
 				panic(err)
@@ -109,12 +115,24 @@ var groupsGetCmd = &cobra.Command{
 				panic(err)
 			}
 
+			bold := func(str string) string {
+				if light.State.On {
+					if len(light.State.Xy) < 2 {
+						return color.OpBold.Render(str)
+					} else {
+						return color.OpBold.Render(color.RGB(pcolor.HueToRGB(light)).Sprint(str))
+					}
+				}
+
+				return str
+			}
+
 			stateStr := "off"
 			if light.State.On {
 				stateStr = "on"
 			}
 
-			fmt.Fprintf(w, "  %v:\t%v\n", light.Name, stateStr)
+			fmt.Fprintf(w, "  %v:\t%v\n", light.Name, bold(stateStr))
 		}
 
 		w.Flush()
