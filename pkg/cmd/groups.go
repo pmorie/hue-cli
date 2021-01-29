@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"sort"
+	"strconv"
 	"text/tabwriter"
 
 	"github.com/amimof/huego"
@@ -95,6 +96,26 @@ var groupsGetCmd = &cobra.Command{
 		fmt.Fprintf(w, "  All On:\t%v\n", group.GroupState.AllOn)
 
 		fmt.Fprintf(w, "Recycle:\t%v\n", group.Recycle)
+
+		fmt.Fprintln(w, "Lights:\t")
+		for i := range group.Lights {
+			id, err := strconv.Atoi(group.Lights[i])
+			if err != nil {
+				panic(err)
+			}
+
+			light, err := bridge.GetLight(id)
+			if err != nil {
+				panic(err)
+			}
+
+			stateStr := "off"
+			if light.State.On {
+				stateStr = "on"
+			}
+
+			fmt.Fprintf(w, "  %v:\t%v\n", light.Name, stateStr)
+		}
 
 		w.Flush()
 	},
