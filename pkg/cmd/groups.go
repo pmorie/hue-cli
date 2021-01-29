@@ -10,6 +10,7 @@ import (
 	"github.com/amimof/huego"
 	"github.com/erikh/colorwriter"
 	"github.com/gookit/color"
+	pcolor "github.com/pmorie/hue-cli/pkg/color"
 	"github.com/spf13/cobra"
 )
 
@@ -99,6 +100,8 @@ var groupsGetCmd = &cobra.Command{
 
 		fmt.Fprintf(w, "Recycle:\t%v\n", group.Recycle)
 
+		// TODO sort
+
 		fmt.Fprintln(w, "Lights:\t")
 		for i := range group.Lights {
 
@@ -114,7 +117,11 @@ var groupsGetCmd = &cobra.Command{
 
 			bold := func(str string) string {
 				if light.State.On {
-					return color.OpBold.Render(str)
+					if len(light.State.Xy) < 2 {
+						return color.OpBold.Render(str)
+					} else {
+						return color.OpBold.Render(color.RGB(pcolor.HueToRGB(light)).Sprint(str))
+					}
 				}
 
 				return str

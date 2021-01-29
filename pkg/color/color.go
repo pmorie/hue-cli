@@ -5,10 +5,10 @@ import (
 	colorful "github.com/lucasb-eyer/go-colorful"
 )
 
-func HueToRGBHex(light huego.Light) string {
+func HueToRGB(light *huego.Light) (r, g, b uint8) {
 	normalizedX := float64(light.State.Xy[0])
 	normalizedY := float64(light.State.Xy[1])
 
 	color := colorful.Xyy(normalizedX, normalizedY, 1.0)
-	return color.Hex()
+	return color.RGB255()
 }
