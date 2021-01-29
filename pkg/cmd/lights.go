@@ -11,10 +11,17 @@ import (
 )
 
 func init() {
-	lightsGetCmd.PersistentFlags().IntVar(&getLightParams.id, "id", 1, "ID of the light to get")
-
 	lightsCmd.AddCommand(lightsListCmd)
+
+	lightsGetCmd.PersistentFlags().IntVar(&getLightParams.id, "id", 1, "ID of the light to get")
 	lightsCmd.AddCommand(lightsGetCmd)
+
+	lightsToggleCmd.PersistentFlags().IntVar(&toggleLightParams.id, "id", 1, "ID of the light to get")
+	lightsCmd.AddCommand(lightsToggleCmd)
+
+	lightsSetCmd.PersistentFlags().IntVar(&setLightParams.id, "id", 1, "ID of the light to get")
+	lightsSetCmd.PersistentFlags().Uint8VarP(&setLightParams.brightness, "brightness", "b", 0, "Brightness of light, 0-254")
+	lightsCmd.AddCommand(lightsSetCmd)
 
 	rootCmd.AddCommand(lightsCmd)
 }
@@ -100,7 +107,9 @@ var lightsGetCmd = &cobra.Command{
 		fmt.Fprintf(w, "  Brightness:\t%v\n", light.State.Bri)
 		fmt.Fprintf(w, "  Hue:\t%v\n", light.State.Hue)
 		fmt.Fprintf(w, "  Saturation:\t%v\n", light.State.Sat)
-		fmt.Fprintf(w, "  XY:\t[%v, %v]\n", light.State.Xy[0], light.State.Xy[1])
+		if len(light.State.Xy) >= 2 {
+			fmt.Fprintf(w, "  XY:\t[%v, %v]\n", light.State.Xy[0], light.State.Xy[1])
+		}
 		fmt.Fprintf(w, "  Color Temperature:\t%v\n", light.State.Ct)
 		fmt.Fprintf(w, "  Alert:\t%v\n", light.State.Alert)
 		fmt.Fprintf(w, "  Effect:\t%v\n", light.State.Effect)
@@ -113,6 +122,86 @@ var lightsGetCmd = &cobra.Command{
 		fmt.Fprintf(w, "  Color Mode:\t%v\n", light.State.ColorMode)
 		fmt.Fprintf(w, "  Reachable:\t%v\n", light.State.Reachable)
 		fmt.Fprintf(w, "  Scene:\t%v\n", light.State.Scene)
+
+		w.Flush()
+	},
+}
+
+type toggleLightParamz struct {
+	id int
+}
+
+var toggleLightParams = &toggleLightParamz{}
+
+var lightsToggleCmd = &cobra.Command{
+	Use:   "toggle",
+	Short: "toggle a specific light",
+	Long:  "TODO",
+	Run: func(cmd *cobra.Command, args []string) {
+		bridgeIP, user := getLoginFromConfig()
+		bridge := huego.New(bridgeIP, user)
+
+		light, err := bridge.GetLight(toggleLightParams.id)
+		if err != nil {
+			s := fmt.Sprintf("unable to connect to bridge: %v", err)
+			panic(s)
+		}
+
+		w := tabwriter.NewWriter(os.Stdout, 0, 0, 1, ' ', 0)
+
+		fmt.Fprintf(w, "Name:\t%v\n", light.Name)
+		fmt.Fprintf(w, "ID:\t%v\n", light.ID)
+		fmt.Fprintf(w, "Type:\t%v\n", light.Type)
+		fmt.Fprintln(w, "State:\t")
+
+		if light.IsOn() {
+			light.Off()
+		} else {
+			light.On()
+		}
+
+		fmt.Fprintf(w, "  On:\t%v\n", light.State.On)
+
+		w.Flush()
+	},
+}
+
+
+type setLightParamz struct {
+	id int
+	brightness uint8
+}
+
+var setLightParams = &setLightParamz{}
+
+var lightsSetCmd = &cobra.Command{
+	Use:   "set",
+	Short: "set a specific light",
+	Long:  "TODO",
+	Run: func(cmd *cobra.Command, args []string) {
+		bridgeIP, user := getLoginFromConfig()
+		bridge := huego.New(bridgeIP, user)
+
+		light, err := bridge.GetLight(setLightParams.id)
+		if err != nil {
+			s := fmt.Sprintf("unable to connect to bridge: %v", err)
+			panic(s)
+		}
+
+		w := tabwriter.NewWriter(os.Stdout, 0, 0, 1, ' ', 0)
+
+		fmt.Fprintf(w, "Name:\t%v\n", light.Name)
+		fmt.Fprintf(w, "ID:\t%v\n", light.ID)
+		fmt.Fprintf(w, "Type:\t%v\n", light.Type)
+		fmt.Fprintln(w, "State:\t")
+
+		if err := light.Bri(setLightParams.brightness); err != nil {
+			s := fmt.Sprintf("unable to set brightness: %v", err)
+			panic(s)
+		}
+
+		fmt.Fprintf(w, "  On:\t%v\n", light.State.On)
+		fmt.Fprintf(w, "  Brightness:\t%v\n", light.State.Bri)
 
 		w.Flush()
 	},
