@@ -1,4 +1,4 @@
-package cmd
+package commands
 
 import (
 	"fmt"
@@ -11,29 +11,29 @@ import (
 )
 
 func init() {
-	rulesCmd.AddCommand(rulesListCmd)
+	scheduleCmd.AddCommand(scheduleListCmd)
 
-	rootCmd.AddCommand(rulesCmd)
+	rootCmd.AddCommand(scheduleCmd)
 }
 
-var rulesCmd = &cobra.Command{
-	Use:   "rules",
-	Short: "work with hue rules",
+var scheduleCmd = &cobra.Command{
+	Use:   "schedule",
+	Short: "work with hue schedule",
 	Long:  `TODO`,
 	Run: func(cmd *cobra.Command, args []string) {
 		// display help
 	},
 }
 
-var rulesListCmd = &cobra.Command{
+var scheduleListCmd = &cobra.Command{
 	Use:   "list",
-	Short: "list rules",
+	Short: "list schedule",
 	Long:  "TODO",
 	Run: func(cmd *cobra.Command, args []string) {
 		bridgeIP, user := getLoginFromConfig()
 		bridge := huego.New(bridgeIP, user)
 
-		rules, err := bridge.GetRules()
+		schedules, err := bridge.GetSchedules()
 		if err != nil {
 			s := fmt.Sprintf("unable to connect to bridge: %v", err)
 			panic(s)
@@ -41,20 +41,20 @@ var rulesListCmd = &cobra.Command{
 
 		w := tabwriter.NewWriter(os.Stdout, 0, 0, 1, ' ', 0)
 
-		sort.Slice(rules, func(i, j int) bool {
-			if len(rules[i].Name) == len(rules[j].Name) {
-				return rules[i].Name < rules[j].Name
+		sort.Slice(schedules, func(i, j int) bool {
+			if len(schedules[i].Name) == len(schedules[j].Name) {
+				return schedules[i].Name < schedules[j].Name
 			}
 
-			return len(rules[i].Name) < len(rules[j].Name)
+			return len(schedules[i].Name) < len(schedules[j].Name)
 		})
 
 		fmt.Fprintln(w, "Name\tStatus")
 		fmt.Fprintln(w, "----\t------")
 
-		for i := range rules {
-			rule := rules[i]
-			fmt.Fprintf(w, "%v\t%v\n", rule.Name, rule.Status)
+		for i := range schedules {
+			schedule := schedules[i]
+			fmt.Fprintf(w, "%v\t%v\n", schedule.Name, schedule.Status)
 		}
 
 		w.Flush()

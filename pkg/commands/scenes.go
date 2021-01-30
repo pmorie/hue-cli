@@ -1,4 +1,4 @@
-package cmd
+package commands
 
 import (
 	"fmt"
@@ -11,29 +11,29 @@ import (
 )
 
 func init() {
-	sensorsCmd.AddCommand(sensorsListCmd)
+	scenesCmd.AddCommand(scenesListCmd)
 
-	rootCmd.AddCommand(sensorsCmd)
+	rootCmd.AddCommand(scenesCmd)
 }
 
-var sensorsCmd = &cobra.Command{
-	Use:   "sensors",
-	Short: "work with hue sensors",
+var scenesCmd = &cobra.Command{
+	Use:   "scenes",
+	Short: "work with hue scenes",
 	Long:  `TODO`,
 	Run: func(cmd *cobra.Command, args []string) {
 		// display help
 	},
 }
 
-var sensorsListCmd = &cobra.Command{
+var scenesListCmd = &cobra.Command{
 	Use:   "list",
-	Short: "list sensors",
+	Short: "list scenes",
 	Long:  "TODO",
 	Run: func(cmd *cobra.Command, args []string) {
 		bridgeIP, user := getLoginFromConfig()
 		bridge := huego.New(bridgeIP, user)
 
-		sensors, err := bridge.GetSensors()
+		scenes, err := bridge.GetScenes()
 		if err != nil {
 			s := fmt.Sprintf("unable to connect to bridge: %v", err)
 			panic(s)
@@ -41,20 +41,20 @@ var sensorsListCmd = &cobra.Command{
 
 		w := tabwriter.NewWriter(os.Stdout, 0, 0, 1, ' ', 0)
 
-		sort.Slice(sensors, func(i, j int) bool {
-			if len(sensors[i].Name) == len(sensors[j].Name) {
-				return sensors[i].Name < sensors[j].Name
+		sort.Slice(scenes, func(i, j int) bool {
+			if len(scenes[i].Name) == len(scenes[j].Name) {
+				return scenes[i].Name < scenes[j].Name
 			}
 
-			return len(sensors[i].Name) < len(sensors[j].Name)
+			return len(scenes[i].Name) < len(scenes[j].Name)
 		})
 
 		fmt.Fprintln(w, "Name\tType")
 		fmt.Fprintln(w, "----\t----")
 
-		for i := range sensors {
-			sensor := sensors[i]
-			fmt.Fprintf(w, "%v\t%v\n", sensor.Name, sensor.Type)
+		for i := range scenes {
+			scene := scenes[i]
+			fmt.Fprintf(w, "%v\t%v\n", scene.Name, scene.Type)
 		}
 
 		w.Flush()
