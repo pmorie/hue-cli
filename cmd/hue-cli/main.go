@@ -1,9 +1,9 @@
 package main
 
 import (
-	"github.com/pmorie/hue-cli/pkg/cmd"
+	"github.com/pmorie/hue-cli/pkg/commands"
 )
 
 func main() {
-	cmd.Execute()
+	commands.Execute()
 }

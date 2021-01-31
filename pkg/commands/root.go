@@ -1,7 +1,8 @@
-package cmd
+package commands
 
 import (
 	"fmt"
+	"github.com/amimof/huego"
 	"os"
 	"path/filepath"
 
@@ -89,4 +90,9 @@ func getLoginFromConfig() (string, string) {
 	}
 
 	return bridgeIP, user
+}
+
+func getBridgeFromConfig() *huego.Bridge {
+	bridgeIP, user := getLoginFromConfig()
+	return huego.New(bridgeIP, user)
 }
