@@ -1,13 +1,16 @@
 package commands
 
 import (
+	"errors"
 	"fmt"
+	"github.com/amimof/huego"
 	"os"
 	"sort"
+	"strings"
 	"text/tabwriter"
 
 	"github.com/spf13/cobra"
-	
+
 	"github.com/pmorie/hue-cli/pkg/commands/options"
 )
 
@@ -79,13 +82,38 @@ func addLightsGet(topLevel *cobra.Command) {
 		Use:   "get",
 		Short: "get a specific light",
 		Long:  "TODO",
-		Run: func(cmd *cobra.Command, args []string) {
+		RunE: func(cmd *cobra.Command, args []string) error {
 			bridge := getBridgeFromConfig()
 
-			light, err := bridge.GetLight(io.ID)
+			var light *huego.Light
+			var err error
+
+			if io.ID > 0 {
+				light, err = bridge.GetLight(io.ID)
+			} else if len(io.Name) > 0 {
+				lights, err := bridge.GetLights()
+				if err != nil {
+					return err
+				}
+				for _, l := range lights {
+					if strings.EqualFold(io.Name, l.Name) {
+						light = &l
+						break
+					}
+					if strings.EqualFold(io.Name, strings.ReplaceAll(l.Name, " ", "_")) {
+						light = &l
+						break
+					}
+				}
+				if light == nil {
+					return errors.New("no light found with the name " + io.Name)
+				}
+			} else {
+				return errors.New("expected name or id flag to be set")
+			}
+
 			if err != nil {
-				s := fmt.Sprintf("unable to connect to bridge: %v", err)
-				panic(s)
+				return fmt.Errorf("unable to connect to bridge: %w", err)
 			}
 
 			w := tabwriter.NewWriter(os.Stdout, 0, 0, 1, ' ', 0)
@@ -121,10 +149,36 @@ func addLightsGet(topLevel *cobra.Command) {
 			fmt.Fprintf(w, "  Scene:\t%v\n", light.State.Scene)
 
 			w.Flush()
+			return nil
 		},
 	}
 
 	options.AddIDArgs(cmd, io)
+
+	_ = cmd.RegisterFlagCompletionFunc("name", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+		match := make([]string, 0)
+
+		fmt.Fprintf(os.Stderr,"matching on %q", toComplete)
+
+		bridge := getBridgeFromConfig()
+
+		lights, err := bridge.GetLights()
+
+		if err != nil {
+			return []string{}, cobra.ShellCompDirectiveError
+		}
+
+		for _, light := range lights {
+			name := strings.ReplaceAll(light.Name, " ", "_")
+			a := strings.ToLower(name)
+			b := strings.ToLower(strings.ReplaceAll(toComplete, " ", "_"))
+			if strings.HasPrefix(a, b) {
+				match = append(match, name)
+			}
+		}
+
+		return match, cobra.ShellCompDirectiveDefault//ShellCompDirectiveNoFileComp
+	})
 
 	topLevel.AddCommand(cmd)
 }
